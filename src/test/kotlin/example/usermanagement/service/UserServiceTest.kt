@@ -26,8 +26,28 @@ class UserServiceTest {
 
     @Test
     fun `createUser should save user, send notification, and increment metric`() {
-        // Existing test implementation
-        // ...
+        // Given
+        val user = User(name = "John Doe", email = "john@example.com")
+        val savedUser = user.copy(id = 1)
+
+        every { userRepository.findByEmail(user.email) } returns null
+        every { userRepository.save(any()) } returns savedUser
+
+        // When
+        val result = userService.createUser(user)
+
+        // Then
+        assertEquals(1, result.id)
+        assertEquals("John Doe", result.name)
+        assertEquals("john@example.com", result.email)
+
+        verify(exactly = 1) { userRepository.findByEmail(user.email) }
+        verify(exactly = 1) { userRepository.save(user) }
+        verify(exactly = 1) {
+            inMemoryQueueService.sendMessage("New user created: John Doe (john@example.com)")
+        }
+
+        assertEquals(1.0, meterRegistry.counter("user.created").count(), 0.01)
     }
 
     @Test
