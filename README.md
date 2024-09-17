@@ -8,6 +8,7 @@ This project is a simple backend application developed using Kotlin and Spring B
 - Asynchronous notifications (using in-memory queue for MVP, Kafka setup demonstrated in code)
 - Basic monitoring using Spring Boot Actuator
 - In-memory H2 database for quick setup and demo
+- PostgreSQL configuration (commented out, for demonstration purposes)
 
 ## Technologies Used
 
@@ -17,15 +18,54 @@ This project is a simple backend application developed using Kotlin and Spring B
 - H2 Database (in-memory)
 - Spring Kafka (configuration demonstrated, not active in MVP)
 - Spring Boot Actuator for monitoring
+- PostgreSQL (configuration provided, not active in MVP)
 
 ## MVP vs Production Setup
 
-For simplicity and ease of running the MVP, this project uses an in-memory queue for asynchronous messaging. However, the code includes commented-out configurations and implementations for using Kafka in a production environment. This demonstrates the knowledge and setup required for a more robust, scalable messaging solution with Kafka.
+For simplicity and ease of running the MVP, this project uses an in-memory H2 database and an in-memory queue for asynchronous messaging. However, the code includes commented-out configurations for using PostgreSQL as the database and Kafka for messaging in a production environment. This demonstrates the knowledge and setup required for a more robust, scalable solution.
 
-To switch to a Kafka-based implementation:
-1. Uncomment Kafka-related code in `UserServiceImpl`, `KafkaConfig`, and `application.properties`
-2. Remove or comment out the `InMemoryQueueService` usage
-3. Ensure a Kafka broker is running and accessible
+To switch to a production-ready setup with PostgreSQL and Kafka:
+
+1. PostgreSQL Setup:
+   - Install PostgreSQL or set up a PostgreSQL Docker container
+   - Create a new database: `CREATE DATABASE usermanagement;`
+   - Create a user and grant privileges:
+     ```sql
+     CREATE USER youruser WITH ENCRYPTED PASSWORD 'yourpassword';
+     GRANT ALL PRIVILEGES ON DATABASE usermanagement TO youruser;
+     ```
+   - Update `application.properties` with PostgreSQL connection details
+   - Uncomment the PostgreSQL dependency in `pom.xml`
+   - Remove or comment out the H2 database dependency
+
+2. Kafka Setup:
+   - Install and start a Kafka broker or set up a Kafka Docker container
+   - Create necessary Kafka topics:
+     ```
+     kafka-topics.sh --create --topic user-creation-topic --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+     kafka-topics.sh --create --topic user-deletion-topic --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+     ```
+   - Update `application.properties` with Kafka configuration
+   - Uncomment Kafka-related code in `KafkaConfig.kt`, `UserServiceImpl.kt`, and other relevant files
+   - Remove the `InMemoryQueueService` and its usages
+
+3. Code Changes:
+   - Update `UserServiceImpl.kt` to use Kafka instead of the in-memory queue
+   - Create a `KafkaConsumerService` to handle incoming Kafka messages
+   - Update `KafkaConfig.kt` with necessary beans for Kafka integration
+
+4. Testing:
+   - Update `application-test.properties` with test-specific PostgreSQL and Kafka configurations
+   - Create integration tests for Kafka message production and consumption
+   - Update existing tests affected by the change from H2 to PostgreSQL
+
+5. Docker Setup:
+   - Update `docker-compose.yml` to include PostgreSQL and Kafka services
+
+6. Documentation:
+   - Update README.md and other documentation to reflect the changes
+
+Please refer to the commented-out sections in the code for specific implementation details.
 
 ## Prerequisites
 
@@ -106,7 +146,8 @@ To stop the application, use:
 
 - This project uses Clean Code principles and appropriate design patterns.
 - This is an MVP (Minimum Viable Product) designed for demonstration purposes.
-- It uses an in-memory H2 database instead of PostgreSQL for simplicity.
+- It uses an in-memory H2 database by default for simplicity.
+- PostgreSQL configuration is provided but commented out, demonstrating how to set up a production-ready database.
 - Kafka integration is demonstrated in the code but not active in the MVP for ease of setup and running.
 
 For any questions or issues, please open an issue in the GitHub repository.
