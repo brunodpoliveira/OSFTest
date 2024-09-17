@@ -10,8 +10,6 @@ This project is a simple backend application developed using Kotlin and Spring B
 - Automated tests using JUnit and MockK
 - Monitoring using Micrometer and Prometheus, including custom metrics
 
-... (previous content remains the same)
-
 ## Running Tests
 
 To run the automated tests, use the following command:
@@ -26,7 +24,6 @@ The application exposes Prometheus metrics at the `/actuator/prometheus` endpoin
 
 Custom metrics include:
 - `user.created`: A counter that increments each time a new user is created
-
 
 ## Prerequisites
 
