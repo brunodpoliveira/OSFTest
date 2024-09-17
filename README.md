@@ -5,7 +5,7 @@ This project is a simple backend application developed using Kotlin and Spring B
 ## Features
 
 - User registration and querying
-- Asynchronous notifications using in-memory Kafka
+- Asynchronous notifications (using in-memory queue for MVP, Kafka setup demonstrated in code)
 - Basic monitoring using Spring Boot Actuator
 - In-memory H2 database for quick setup and demo
 
@@ -15,8 +15,17 @@ This project is a simple backend application developed using Kotlin and Spring B
 - Kotlin
 - Spring Data JPA
 - H2 Database (in-memory)
-- Spring Kafka (with in-memory broker for MVP)
+- Spring Kafka (configuration demonstrated, not active in MVP)
 - Spring Boot Actuator for monitoring
+
+## MVP vs Production Setup
+
+For simplicity and ease of running the MVP, this project uses an in-memory queue for asynchronous messaging. However, the code includes commented-out configurations and implementations for using Kafka in a production environment. This demonstrates the knowledge and setup required for a more robust, scalable messaging solution with Kafka.
+
+To switch to a Kafka-based implementation:
+1. Uncomment Kafka-related code in `UserServiceImpl`, `KafkaConfig`, and `application.properties`
+2. Remove or comment out the `InMemoryQueueService` usage
+3. Ensure a Kafka broker is running and accessible
 
 ## Prerequisites
 
@@ -92,24 +101,12 @@ To stop the application, use:
    ```
    docker-compose down
    ```
-### Notes on Docker Setup
-
-- The application runs in a single container, including the H2 database and simulated Kafka.
-- The `SPRING_PROFILES_ACTIVE=docker` environment variable in `docker-compose.yml` activates the Docker-specific configuration.
-- In a production environment, you would typically have separate containers for the application, database, and Kafka.
 
 ## Notes
 
 - This project uses Clean Code principles and appropriate design patterns.
 - This is an MVP (Minimum Viable Product) designed for demonstration purposes.
 - It uses an in-memory H2 database instead of PostgreSQL for simplicity.
-- Kafka is simulated using an in-memory implementation for demo purposes.
-- In a production environment, you would use a proper PostgreSQL database and a real Kafka setup.
-
-## Additional Information
-
-- The application uses Spring Data JPA for database operations.
-- Asynchronous notifications are simulated using an in-memory Kafka implementation.
-- Basic monitoring is implemented using Spring Boot Actuator.
+- Kafka integration is demonstrated in the code but not active in the MVP for ease of setup and running.
 
 For any questions or issues, please open an issue in the GitHub repository.

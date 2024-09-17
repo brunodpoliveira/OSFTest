@@ -1,5 +1,6 @@
 package com.example.usermanagement.model
 
+import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -16,6 +17,7 @@ data class User(
     @Column(nullable = false, unique = true)
     val email: String,
 
-    @Column(nullable = false)
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now()
 )

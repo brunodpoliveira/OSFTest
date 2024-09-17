@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management</title>
+</head>
+<body>
+<h1>User Management System</h1>
+<p>Use the API endpoints to interact with the system:</p>
+<ul>
+    <li>POST /api/users - Create a new user</li>
+    <li>GET /api/users - Get all users</li>
+    <li>GET /api/users/{id} - Get a user by ID</li>
+</ul>
+
+<h2>Users:</h2>
+<ul id="userList"></ul>
+
+<script>
+    fetch('/api/users')
+        .then(response => response.json())
+        .then(users => {
+            const userList = document.getElementById('userList');
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = `${user.name} (${user.email})`;
+                userList.appendChild(li);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+</script>
+</body>
+</html>

@@ -7,4 +7,5 @@ interface UserService {
     fun getUserById(id: Long): User?
     fun getAllUsers(): List<User>
     fun getUserByEmail(email: String): User?
+    fun deleteUser(id: Long): Boolean
 }
