@@ -2,39 +2,37 @@ package com.example.usermanagement.service
 
 import com.example.usermanagement.model.User
 import com.example.usermanagement.repository.UserRepository
-import io.micrometer.core.instrument.MeterRegistry
+import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Counter
 
 @Service
 class UserServiceImpl(
     private val userRepository: UserRepository,
-    private val kafkaProducerService: KafkaProducerService,
+    private val kafkaTemplate: KafkaTemplate<String, String>,
     private val meterRegistry: MeterRegistry
 ) : UserService {
 
-    @Transactional
+    private val userCreationCounter: Counter = Counter.builder("user.created")
+        .description("The number of users created")
+        .register(meterRegistry)
+
     override fun createUser(user: User): User {
-        val createdUser = userRepository.save(user)
-        sendUserCreationNotification(createdUser)
-        meterRegistry.counter("user.created").increment()
-        return createdUser
+        val savedUser = userRepository.save(user)
+        sendNotification(savedUser)
+        userCreationCounter.increment()
+        return savedUser
     }
 
-    override fun getUserById(id: Long): User? {
-        return userRepository.findById(id).orElse(null)
-    }
+    override fun getUserById(id: Long): User? = userRepository.findById(id).orElse(null)
 
-    override fun getAllUsers(): List<User> {
-        return userRepository.findAll()
-    }
+    override fun getAllUsers(): List<User> = userRepository.findAll()
 
-    override fun getUserByEmail(email: String): User? {
-        return userRepository.findByEmail(email)
-    }
+    override fun getUserByEmail(email: String): User? = userRepository.findByEmail(email)
 
-    private fun sendUserCreationNotification(user: User) {
+    private fun sendNotification(user: User) {
         val message = "New user created: ${user.name} (${user.email})"
-        kafkaProducerService.sendMessage("user-creation-topic", message)
+        kafkaTemplate.send("user-creation-topic", message)
     }
 }

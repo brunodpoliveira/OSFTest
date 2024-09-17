@@ -5,14 +5,13 @@ import com.example.usermanagement.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/users")
 class UserController(private val userService: UserService) {
 
     @PostMapping
-    fun createUser(@Valid @RequestBody user: User): ResponseEntity<User> {
+    fun createUser(@RequestBody user: User): ResponseEntity<User> {
         val createdUser = userService.createUser(user)
         return ResponseEntity(createdUser, HttpStatus.CREATED)
     }

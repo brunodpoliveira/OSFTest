@@ -1,28 +1,27 @@
-package example.usermanagement.service
+package com.example.usermanagement.service
 
 import com.example.usermanagement.model.User
 import com.example.usermanagement.repository.UserRepository
-import com.example.usermanagement.service.KafkaProducerService
-import com.example.usermanagement.service.UserServiceImpl
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.kafka.core.KafkaTemplate
 
 class UserServiceTest {
 
     private lateinit var userRepository: UserRepository
-    private lateinit var kafkaProducerService: KafkaProducerService
+    private lateinit var kafkaTemplate: KafkaTemplate<String, String>
     private lateinit var meterRegistry: SimpleMeterRegistry
     private lateinit var userService: UserServiceImpl
 
     @BeforeEach
     fun setup() {
         userRepository = mockk()
-        kafkaProducerService = mockk(relaxed = true)
+        kafkaTemplate = mockk(relaxed = true)
         meterRegistry = SimpleMeterRegistry()
-        userService = UserServiceImpl(userRepository, kafkaProducerService, meterRegistry)
+        userService = UserServiceImpl(userRepository, kafkaTemplate, meterRegistry)
     }
 
     @Test
@@ -41,7 +40,7 @@ class UserServiceTest {
 
         verify(exactly = 1) { userRepository.save(any()) }
         verify(exactly = 1) {
-            kafkaProducerService.sendMessage(
+            kafkaTemplate.send(
                 "user-creation-topic",
                 "New user created: John Doe (john@example.com)"
             )
